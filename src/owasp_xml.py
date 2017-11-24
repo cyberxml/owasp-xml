@@ -8,7 +8,7 @@ testflag=True
 testxmldoc="../testdocs/U_RedHat_5_STIG_V1R18_Manual-xccdf.xml"
 
 #TODO: maybe make this a percentage instead of hard value?
-opentagsallowed=40 # 2.3 
+#opentagsallowed=40 # 2.3 
 
 
 class TimeoutException(Exception): pass
@@ -25,24 +25,23 @@ def time_limit(seconds):
        signal.alarm(0)
 
 # OWASP 2.1 More Time Required
-def xml_more_time_required(xmldoc,seconds):
+def owasp_xml_2_1_more_time_required(xmldoc,seconds):
     try:
         with time_limit(seconds):
             with open(xmldoc, 'rt') as f:
                 tree = ElementTree.parse(f)
-        print("File %s parsed within time" % (xmldoc))
+        return(0, "OWASP 2.1: File %s parsed within time" % (xmldoc))
     except TimeoutException as e:
-        print("File %s parsing timed out" % (xmldoc))
+        return(1,"OWASP 2.1: File %s parsing timed out" % (xmldoc))
 
 # OWASP 2.2.1 Malformed Document to Malformed Document
-def xml_document_parsing(xmldoc):
+def owasp_xml_2_2_1_document_parsing(xmldoc):
     try:
         with open(xmldoc, 'rt') as f:
             tree = ElementTree.parse(f)
-        print("File %s parsed with xml.tree.ElementTree" % (xmldoc))
+        return(0,"OWASP 2.2.1: File %s parsed with xml.tree.ElementTree" % (xmldoc))
     except ElementTree.ParseError as e:
-        print("File %s does not parse with xml.tree.ElementTree" % (xmldoc))
-        print("ElementTree.ParseError: %s" % (e))
+        return("1, OWASP 2.2.1: File %s does not parse with xml.tree.ElementTree" % (xmldoc))
 
 
 # OWASP 2.2.2 Well-Formed Document to Well-Formed Document Normalized
@@ -51,14 +50,13 @@ def owasp_xml_2_2_2_normalization(xmldoc):
     try:
         with open(xmldoc, 'rt') as f:
             tree = ElementTree.parse("xmldoc")
-        print("File %s parsed with lxml.etree.ElementTree" % (xmldoc))
+        return(0,"OWASP 2.2.2: File %s parsed with lxml.etree.ElementTree" % (xmldoc))
     except ElementTree.ParseError as e:
-        print("File %s does not parse with xml.tree.ElementTree" % (xmldoc))
-        print("ElementTree.ParseError: %s" % (e))
+        return(1,"OWASP 2.2.2: File %s does not parse with xml.tree.ElementTree" % (xmldoc))
 
 # OWASP 2.3 Coersive Parsing
 # https://stackoverflow.com/questions/35761133/python-how-to-check-for-open-and-close-tags
-def owasp_xml_2_3_coersive_parsing(xmldoc):
+def owasp_xml_2_3_coersive_parsing(xmldoc,opentagsallowed):
     stack = []
     with open(xmldoc, 'r') as parse_file:
         for line in parse_file:
@@ -95,13 +93,11 @@ def owasp_xml_2_3_coersive_parsing(xmldoc):
         
         if len(stack):
             if len(stack) > opentagsallowed:
-                print "Number of blocks still open at EOF:", len(stack)
-                return(len(stack))
+                return(1,"OWASP 2.3: Number of blocks still open at EOF: %d", (len(stack)))
             else:
-                print "Number of blocks still open at EOF:", len(stack)
-                return(0)
+                return(0, "OWASP 2.3: Number of blocks still open at EOF: %d", (len(stack)))
         else:
-           return(0)
+            return(0, "OEASP 2.3: Number of blocks still open at EOF: %d" % (0))
 
 
 # OWASP 3.1a: Document without schema
