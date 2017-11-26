@@ -11,7 +11,7 @@ opentagsallowed=40
 
 def process_results((result,retstr)):
     if result > 0:
-        print("Flag: Deny")
+        print("FLAG: Deny")
         print("META: "+retstr)
         exit(1)
 
@@ -22,7 +22,7 @@ process_results(owasp_xml_3_1a_schemaLocation_defined(thisxmldoc))
 process_results(owasp_xml_3_1b_schema_validates(thisxmldoc))
 
 # looks like we've made it!
-print("Flag: Allow")
+print("FLAG: Allow")
 print("META: OWASP_XML good")
 
 

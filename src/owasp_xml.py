@@ -93,9 +93,9 @@ def owasp_xml_2_3_coersive_parsing(xmldoc,opentagsallowed):
         
         if len(stack):
             if len(stack) > opentagsallowed:
-                return(1,"OWASP 2.3: Number of blocks still open at EOF: %d", (len(stack)))
+                return(1,"OWASP 2.3: Number of blocks still open at EOF: %d" % (len(stack)))
             else:
-                return(0, "OWASP 2.3: Number of blocks still open at EOF: %d", (len(stack)))
+                return(0, "OWASP 2.3: Number of blocks still open at EOF: %d" % (len(stack)))
         else:
             return(0, "OEASP 2.3: Number of blocks still open at EOF: %d" % (0))
 
@@ -133,21 +133,21 @@ def owasp_xml_3_1b_schema_validates(xmldoc):
         for x in xsds:
             try:
                 xsdtree = etree.parse(x)
+                try:
+                    xmlschema = etree.XMLSchema(xsdtree)
+                    # make sure you test all schemas
+                    if xmlschema.validate(tree):
+                        valids.append(x)
+                except:
+                    #return(4, "OWASP 3.1.b: in %s xsd schema %s could not be imported" % (xmldoc,x))
+                    pass
             except:
-                return(3, "OWASP 3.1.b: in %s xsd schema %s could not be parsed by etree" % (xmldoc,x))
-            try:
-                xmlschema = etree.XMLSchema(xsdtree)
-            except:
-                return(4, "OWASP 3.1.b: in %s xsd schema %s could not be imported" % (xmldoc,x))
-            if xmlschema.validate(tree):
-                # make sure you test all schemas
-                valids.append(x)
-                
+                #return(3, "OWASP 3.1.b: in %s xsd schema %s could not be parsed by etree" % (xmldoc,x))
+                pass
+
         if len(valids):
             return(0, "OWASP 3.1.b: xml document %s validates with internally defined schema %s" % (xmldoc,valids))
         else: 
             return(5, "OWASP 3.1.b: xml document %s does not validate with internally defined schema" % (xmldoc))
             
-
-     
 
